@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blog Post Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark-white: #fafafa;
+      --blue: #85b3da;
+      --grey: #585c60;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      font-size: 18px;
+      background-color: var(--dark-white);
+      color: var(--grey);
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h1, h2 {
+      font-family: 'Fragment Mono', monospace;
+      font-weight: 400;
+      margin: 1rem 0;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--grey);
+      background: var(--white);
+      color: var(--grey);
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: transparent;
+      color: var(--grey);
+      border: 1px solid var(--grey);
+      cursor: pointer;
+    }
+
+    .post {
+      border: 1px solid var(--grey);
+      padding: 1rem;
+      background-color: var(--white);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .tags {
+      color: var(--grey);
+      margin: 0.5rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tags span {
+      border: 1px solid var(--grey);
+      padding: 0.2rem 0.5rem;
+    }
+
+    .pinned {
+      font-style: italic;
+    }
+
+    #posts {
+      margin-top: 2rem;
+    }
+
+    input[type="file"] {
+      margin-bottom: 1rem;
+    }
+
+    #newTitle, #newTags {
+      font-size: 1rem;
+      padding: 0.5rem;
+      font-family: 'Fragment Mono', monospace;
+    }
+
+    #new-post {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    #new-post button {
+      align-self: start;
+      width: auto;
+    }
+
+  </style>
+</head>
+<body>
+
+<h1>Blog Post Manager</h1>
+
+<input type="file" id="fileInput" />
+<button onclick="downloadJSON()">Download JSON</button>
+
+<div id="posts"></div>
+
+<div id="new-post">
+<h2>Add New Post</h2>
+<input id="newTitle" placeholder="Title" />
+<textarea id="newContent" placeholder="Content"></textarea>
+<input id="newTags" placeholder="Tags (comma-separated)" />
+<input id="newDate" type="date" />
+<label><input type="checkbox" id="newPinned" /> Pinned</label>
+<button onclick="addPost()">Add Post</button>
+</div>
+
+<script>
+  let posts = [];
+  let editingIndex = -1;
+
+  document.getElementById('fileInput').addEventListener('change', function (e) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      posts = JSON.parse(reader.result);
+      renderPosts();
+    };
+    reader.readAsText(e.target.files[0]);
+  });
+
+  function renderPosts() {
+    const container = document.getElementById('posts');
+    container.innerHTML = '';
+    posts.forEach((post, i) => {
+      if (i === editingIndex) {
+        container.innerHTML += `
+          <div class="post">
+            <input id="editTitle" value="${post.title}" />
+            <textarea id="editContent">${post.content}</textarea>
+            <input id="editTags" value="${post.tags.join(', ')}" />
+            <input id="editDate" type="date" value="${getInputDate(post.date)}" />
+            <label><input type="checkbox" id="editPinned" ${post.pinned ? 'checked' : ''} /> Pinned</label><br>
+            <div id="buttons">
+              <button onclick="saveEdit(${i})">Save</button>
+              <button onclick="cancelEdit()">Cancel</button>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML += `
+          <div class="post">
+            <div><strong>${post.title}</strong> <span class="${post.pinned ? 'pinned' : ''}">${post.pinned ? 'pinned' : ''}</span></div>
+            <div class="tags">${post.tags.map(tag => `<span>${tag}</span>`).join('')}</div>
+            <div><em>${post.date}</em></div>
+            <p>${post.content}</p>
+            <div id="buttons">
+              <button onclick="saveEdit(${i})">Save</button>
+              <button onclick="cancelEdit()">Cancel</button>
+            </div>
+          </div>
+        `;
+      }
+    });
+  }
+
+  function getInputDate(dateString) {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  }
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  function addPost() {
+    const title = document.getElementById('newTitle').value.trim();
+    const content = document.getElementById('newContent').value.trim();
+    const tags = document.getElementById('newTags').value.split(',').map(t => t.trim()).filter(t => t);
+    const date = document.getElementById('newDate').value;
+    const pinned = document.getElementById('newPinned').checked;
+
+    if (title && content && date) {
+      posts.unshift({ title, content, tags, date: formatDate(date), pinned });
+      renderPosts();
+      clearForm();
+    } else {
+      alert("Title, content, and date are required.");
+    }
+  }
+
+  function editPost(index) {
+    editingIndex = index;
+    renderPosts();
+  }
+
+  function saveEdit(index) {
+    const title = document.getElementById('editTitle').value.trim();
+    const content = document.getElementById('editContent').value.trim();
+    const tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
+    const date = document.getElementById('editDate').value;
+    const pinned = document.getElementById('editPinned').checked;
+
+    if (title && content && date) {
+      posts[index] = { title, content, tags, date: formatDate(date), pinned };
+      editingIndex = -1;
+      renderPosts();
+    } else {
+      alert("Title, content, and date are required.");
+    }
+  }
+
+  function cancelEdit() {
+    editingIndex = -1;
+    renderPosts();
+  }
+
+  function deletePost(index) {
+    if (confirm("Are you sure you want to delete this post?")) {
+      posts.splice(index, 1);
+      renderPosts();
+    }
+  }
+
+  function downloadJSON() {
+    const blob = new Blob([JSON.stringify(posts, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'posts.json';
+    a.click();
+  }
+
+  function clearForm() {
+    document.getElementById('newTitle').value = '';
+    document.getElementById('newContent').value = '';
+    document.getElementById('newTags').value = '';
+    document.getElementById('newDate').value = '';
+    document.getElementById('newPinned').checked = false;
+  }
+</script>
+
+</body>
+</html>

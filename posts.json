@@ -1,0 +1,23 @@
+[
+  {
+    "title": "First Post",
+    "content": "This is the content of the first post.",
+    "tags": ["esl", "startup"],
+    "date": "June 1, 2025",
+    "pinned": true
+  },
+  {
+    "title": "Second Post",
+    "content": "Some interesting insights here.",
+    "tags": ["coding", "self-taught"],
+    "date": "June 2, 2025",
+    "pinned": true
+  },
+    {
+    "title": "Third Post",
+    "content": "Some interesting insights here.",
+    "tags": ["coding", "self-taught"],
+    "date": "June 2, 2025",
+    "pinned": true
+  }
+]

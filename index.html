@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+  <title>My Blog</title>
+  <style>
+    /* === Reset & Base Setup === */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    * {
+      margin: 0;
+    }
+    body {
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      background-color: var(--dark-white);
+      color: var(--grey);
+      font-family: 'Lato', sans-serif;
+      font-size: 20px;
+    }
+    img, picture, video, canvas, svg {
+      display: block;
+      max-width: 100%;
+    }
+    input, button, textarea, select {
+      font: inherit;
+    }
+    p, h1, h2, h3, h4, h5, h6 {
+      overflow-wrap: break-word;
+    }
+    p {
+      text-wrap: pretty;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      text-wrap: balance;
+    }
+    #root, #__next {
+      isolation: isolate;
+    }
+
+    /* === Variables === */
+    :root {
+      --dark-white: #fafafa;
+      --blue: #85b3da;
+      --grey: #585c60;
+      --white: #ffffff;
+    }
+
+    /* === Layout === */
+    .wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* === Header === */
+    .header {
+      display: flex;
+      gap: 1rem;
+    }
+    .header a {
+      color: var(--grey);
+      text-decoration: none;
+    }
+
+    /* === Tags Section === */
+    .tags-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .tag {
+      padding: 0.2rem 0.5rem;
+      border: 2px solid var(--grey);
+      border-bottom: none;
+      color: var(--grey);
+      transition: all 0.2s ease;
+    }
+
+    .tag:hover {
+      cursor: pointer;
+    }
+
+    /* === Cards Section === */
+    .cards-section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      border: 2px solid var(--grey);
+      border-right: none;
+      transition: all 0.2s ease;
+    }
+
+    .card h3 {
+      margin-bottom: 2rem;
+      font-family: "Fragment Mono", monospace;
+      font-weight: 400;
+    }
+
+    .card:hover {
+      background-color: var(--grey);
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .card:hover .tag {
+      color: var(--white);
+      border-color: var(--white);
+    }
+
+    .date {
+      margin-top: auto;
+      font-size: 1rem;
+    }
+
+    /* === Blog Posts === */
+    .blog-post {
+      margin-top: 2rem;
+      padding: 2rem;
+      border: 2px solid var(--grey);
+      border-bottom: none;
+    }
+
+    .blog-post h2 {
+      margin: 2rem 0;
+      font-size: 2rem;
+      font-family: "Fragment Mono", monospace;
+      font-weight: 400;
+    }
+
+    .blog-post p {
+      margin-bottom: 1rem;
+    }
+
+    .blog-post .date {
+      margin-top: 2rem;
+    }
+
+    /* === Responsive === */
+    @media (max-width: 768px) {
+      .cards-section {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<main class="wrapper">
+
+  <header>
+    <nav class="header">
+      <a href="#">Blog</a>
+      <a href="#">Projects</a>
+      <a href="#">About</a>
+    </nav>
+  </header>
+
+  <!-- === Optional Tag Filters === -->
+  <section class="tags-section" aria-label="Tag Filter">
+    <span class="tag">esl</span>
+    <span class="tag">edtech</span>
+    <span class="tag">coding</span>
+    <span class="tag">startup</span>
+    <span class="tag">self-taught</span>
+    <span class="tag">korea</span>
+  </section>
+
+  <!-- === Pinned Posts === -->
+  <section class="cards-section" aria-label="Pinned Blog Posts">
+    <!-- Example card structure -->
+    <!--
+    <article class="card">
+      <div class="tags">
+        <span class="tag">example</span>
+      </div>
+      <h3>Pinned Post Title</h3>
+      <div class="date">June 1, 2025</div>
+    </article>
+    -->
+  </section>
+
+  <!-- === Main Blog Feed === -->
+  <section aria-label="All Blog Posts">
+    <!-- Example blog post structure -->
+    <!--
+    <article class="blog-post">
+      <div class="tags">
+        <span class="tag">example</span>
+        <span class="tag">news</span>
+      </div>
+      <h2>Blog Post Title</h2>
+      <p>Intro paragraph or snippet...</p>
+      <div class="date">June 1, 2025</div>
+    </article>
+    -->
+  </section>
+
+</main>
+<script>
+  async function loadPostsFromJSON() {
+    try {
+      const response = await fetch('posts.json');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const posts = await response.json();
+
+      const pinnedSection = document.querySelector(".cards-section");
+      const blogSection = document.querySelector('[aria-label="All Blog Posts"]');
+
+      // Clear sections in case of reload
+      pinnedSection.innerHTML = '';
+      blogSection.innerHTML = '';
+
+      // Pinned posts (up to 3)
+      const pinnedPosts = posts.filter(post => post.pinned).slice(0, 3);
+      pinnedPosts.forEach(post => {
+        const tags = post.tags.map(tag => `<span class="tag">${tag}</span>`).join("");
+        const card = document.createElement("article");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="tags">${tags}</div>
+          <h3>${post.title}</h3>
+          <div class="date">${post.date}</div>
+        `;
+        pinnedSection.appendChild(card);
+      });
+
+      // All blog posts
+      posts.forEach(post => {
+        const tags = post.tags.map(tag => `<span class="tag">${tag}</span>`).join("");
+        const article = document.createElement("article");
+        article.className = "blog-post";
+        article.innerHTML = `
+          <div class="tags">${tags}</div>
+          <h2>${post.title}</h2>
+          <p>${post.content}</p>
+          <div class="date">${post.date}</div>
+        `;
+        blogSection.appendChild(article);
+      });
+    } catch (error) {
+      console.error('Error loading blog posts:', error);
+    }
+  }
+
+  loadPostsFromJSON();
+</script>
+
+
+</body>
+</html>
