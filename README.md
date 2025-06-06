@@ -18,4 +18,3 @@ A simple tool to manage your blog posts quietly and locally.
 ## Purpose
 
 This tool is not for performance or scale, just for keeping your writing in order.
-# blog
